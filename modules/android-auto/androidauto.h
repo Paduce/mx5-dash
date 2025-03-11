@@ -4,8 +4,8 @@
 #include <QObject>
 #include <QThreadPool>
 #include <QDebug>
-#include <plugininterface.h>
-#include <mediainterface.h>
+#include "plugininterface.h"
+#include "mediainterface.h"
 #include "headunit.h"
 
 class AndroidAutoPlugin : public QObject, PluginInterface, public MediaInterface
