@@ -47,13 +47,26 @@ ThemeRoot {
             id: mouseArea1
             anchors.fill: parent
             onPressed:{
-                pluginContext.mouseDown(Qt.point(mouse.x, mouse.y));
+                // Map coordinates directly to video coordinates
+                var mappedPoint = mapTouchCoordinates(mouse.x, mouse.y);
+                pluginContext.mouseDown(mappedPoint);
             }
             onPositionChanged:{
-                pluginContext.mouseMove(Qt.point(mouse.x, mouse.y));
+                var mappedPoint = mapTouchCoordinates(mouse.x, mouse.y);
+                pluginContext.mouseMove(mappedPoint);
             }
             onReleased:{
-                pluginContext.mouseUp(Qt.point(mouse.x, mouse.y));
+                var mappedPoint = mapTouchCoordinates(mouse.x, mouse.y);
+                pluginContext.mouseUp(mappedPoint);
+            }
+            
+            // Add mapping function
+            function mapTouchCoordinates(x, y) {
+                // Scale directly from mouse area to Android Auto native size
+                var mappedX = (x / width) * pluginContext.videoWidth;
+                var mappedY = (y / height) * pluginContext.videoHeight;
+                
+                return Qt.point(mappedX, mappedY);
             }
         }
 
@@ -75,6 +88,5 @@ ThemeRoot {
             pluginContext.outputHeight = aaVideo.height
             pluginContext.outputWidth = aaVideo.width
         }
-
     }
 }

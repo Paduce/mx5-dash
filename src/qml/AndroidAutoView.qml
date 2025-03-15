@@ -24,28 +24,29 @@ Item {
             anchors.fill: parent
             
             onPressed: {
-                // Just pass raw coordinates
-                aaService.mouseDown(Qt.point(mouse.x, mouse.y));
+                // Use the mapping function instead of raw coordinates
+                var mappedPoint = mapTouchCoordinates(mouse.x, mouse.y);
+                aaService.mouseDown(mappedPoint);
             }
 
             onPositionChanged: {
-                aaService.mouseMove(Qt.point(mouse.x, mouse.y));
+                var mappedPoint = mapTouchCoordinates(mouse.x, mouse.y);
+                aaService.mouseMove(mappedPoint);
             }
 
             onReleased: {
-                aaService.mouseUp(Qt.point(mouse.x, mouse.y));
+                var mappedPoint = mapTouchCoordinates(mouse.x, mouse.y);
+                aaService.mouseUp(mappedPoint);
             }
+            
             // Function to map touch coordinates correctly
             function mapTouchCoordinates(x, y) {
-                // Scale from display size to Android Auto native size
-                var scaleX = aaService.videoWidth / videoOutput.width;
-                var scaleY = aaService.videoHeight / videoOutput.height;
+                // Scale directly from mouse area to Android Auto native size
+                // instead of relying on intermediate scaling in headunit.cpp
+                var mappedX = (x / width) * aaService.videoWidth;
+                var mappedY = (y / height) * aaService.videoHeight;
                 
-                // Apply scaling and offset if needed
-                var mappedX = x * scaleX;
-                var mappedY = y * scaleY;
-                
-                // Create a point with the translated coordinates
+                // Return point with the properly scaled coordinates
                 return Qt.point(mappedX, mappedY);
             }
         }

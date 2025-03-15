@@ -416,11 +416,29 @@ bool Headunit::keyEvent(QString /*key*/){
 }
 
 void Headunit::touchEvent(HU::TouchInfo::TOUCH_ACTION action, QPoint *point) {
-    float normx = float(point->x()) / float(m_outputWidth);
-    float normy = float(point->y()) / float(m_outputHeight);
+    // If point coordinates are already in video coordinate space (from QML mapping),
+    // they might be larger than m_outputWidth/m_outputHeight
+    // So we need to check if scaling is actually needed
+    
+    unsigned int x, y;
+    
+    // If the point is already in the video coordinate space
+    if (point->x() <= m_videoWidth && point->y() <= m_videoHeight && 
+        point->x() >= 0 && point->y() >= 0) {
+        x = point->x();
+        y = point->y();
+    } else {
+        // Otherwise normalize and scale
+        float normx = float(point->x()) / float(m_outputWidth);
+        float normy = float(point->y()) / float(m_outputHeight);
 
-    unsigned int x = (unsigned int) (normx * m_videoWidth);
-    unsigned int y = (unsigned int) (normy * m_videoHeight);
+        x = (unsigned int) (normx * m_videoWidth);
+        y = (unsigned int) (normy * m_videoHeight);
+    }
+
+    // Ensure coordinates are within valid video size range
+    x = qBound(0u, x, (unsigned int)m_videoWidth);
+    y = qBound(0u, y, (unsigned int)m_videoHeight);
 
     if(huStarted){
         g_hu->queueCommand([action, x, y](AndroidAuto::IHUConnectionThreadInterface & s) {
