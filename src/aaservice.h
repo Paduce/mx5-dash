@@ -41,9 +41,11 @@ public slots:
     void start();
     void stop();
 
-
 private slots:
     void checkForDevice();
+    
+private:
+    void applyCustomSettings();
 
 signals:
     void videoSurfaceChanged();
@@ -60,7 +62,5 @@ private:
     int m_outputWidth = 1280;
     int m_outputHeight = 720;
 };
-
-
 
 #endif // AASERVICE_H

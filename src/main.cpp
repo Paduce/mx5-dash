@@ -4,7 +4,7 @@
 #include <gst/gst.h>
 
 #include "aaservice.h"
-
+#include "aasettings.h"
 
 int main(int argc, char *argv[])
 {
@@ -26,13 +26,19 @@ int main(int argc, char *argv[])
         gst_object_unref(src_factory);
         qDebug() << "Found appsrc element";
     }
-
     
     QCoreApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
     QGuiApplication app(argc, argv);
     
+    // Set application info
+    QCoreApplication::setOrganizationName("MX5-Dash");
+    QCoreApplication::setApplicationName("AndroidAutoQt");
+    
     // Initialize GStreamer
     gst_init(&argc, &argv);
+    
+    // Initialize settings
+    AASettings::instance()->initialize();
     
     // Create Android Auto service
     AAService aaService;

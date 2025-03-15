@@ -13,6 +13,7 @@
 #include <gst/video/video.h>
 #include "hu_uti.h"
 #include "hu_aap.h"
+#include "../../src/aasettings.h"
 
 Headunit::Headunit(QObject *parent) : QObject(parent),
     callbacks(this)
@@ -44,34 +45,46 @@ int Headunit::startHU(){
     std::map<std::string, std::string> aa_settings;
 
     qDebug() << "Starting headunit";
-    if(settings.childGroups().contains("AndroidAuto")){
-        settings.beginGroup("AndroidAuto");
-        QStringList keys = settings.childKeys();
 
-        for (int i = 0; i < keys.size(); ++i){
-            aa_settings[keys.at(i).toStdString()] = settings.value(keys.at(i)).toString().toStdString();
-        }
+
+    aa_settings = AASettings::instance()->getStdStringMap();
+
+    qDebug() << "Android Auto settings from config file:";
+    for (const auto& pair : aa_settings) {
+        qDebug() << "  " << QString::fromStdString(pair.first) << ":" << QString::fromStdString(pair.second);
     }
 
-    if(settings.childKeys().contains("resolution")){
-        QVariant res = settings.value("resolution");
-        if(res.canConvert(QMetaType::Int)){
-            switch(res.toInt()){
-            case 1:
-                setVideoWidth(800);
-                setVideoHeight(480);
-                break;
-            case 2:
-                setVideoWidth(1280);
-                setVideoHeight(720);
-                break;
-            case 3:
-                setVideoWidth(1920);
-                setVideoHeight(1080);
-                break;
-            }
+        auto it = aa_settings.find("resolution");
+    if (it != aa_settings.end()) {
+        int resVal = std::stoi(it->second);
+        qDebug() << "Setting resolution from config file:" << resVal;
+        
+        switch(resVal) {
+        case 1:
+            setVideoWidth(800);
+            setVideoHeight(480);
+            break;
+        case 2:
+            setVideoWidth(1280);
+            setVideoHeight(720);
+            break;
+        case 3:
+            setVideoWidth(1920);
+            setVideoHeight(1080);
+            break;
+        default:
+            // Default to 1280x720
+            setVideoWidth(1280);
+            setVideoHeight(720);
+            qDebug() << "Unknown resolution value:" << resVal << ", defaulting to 1280x720";
+            break;
         }
+    } else {
+        qDebug() << "Resolution not found in config, defaulting to 1280x720";
+        setVideoWidth(1280);
+        setVideoHeight(720);
     }
+    
     aa_settings["ts_height"] = std::to_string(m_videoHeight);
     aa_settings["ts_width"] = std::to_string(m_videoWidth);
 
@@ -86,10 +99,48 @@ int Headunit::startHU(){
     return 1;
 }
 
-int Headunit::init(){
+int Headunit::init()
+{
+    // Get settings from our configuration system
+    std::map<std::string, std::string> aa_settings;
+    aa_settings = AASettings::instance()->getStdStringMap();
+    
+    // Apply resolution setting
+    QString resolutionSetting = AASettings::instance()->getSetting("resolution", "2");
+    int resVal = resolutionSetting.toInt();
+    
+    // Set video dimensions based on resolution setting
+    switch(resVal) {
+    case 1:
+        setVideoWidth(800);
+        setVideoHeight(480);
+        break;
+    case 2:
+        setVideoWidth(1280);
+        setVideoHeight(720);
+        break;
+    case 3:
+        setVideoWidth(1920);
+        setVideoHeight(1080);
+        break;
+    default:
+        // Default to 1280x720
+        setVideoWidth(1280);
+        setVideoHeight(720);
+        break;
+    }
+    
+    // Update settings with actual dimensions
+    AASettings::instance()->setSetting("ts_width", QString::number(m_videoWidth));
+    AASettings::instance()->setSetting("ts_height", QString::number(m_videoHeight));
+    
+    qDebug() << "Android Auto initialized with resolution:" << m_videoWidth << "x" << m_videoHeight;
+    qDebug() << "DPI setting:" << AASettings::instance()->getSetting("dpi");
+
+    // Continue with the rest of initialization
+    // ...
     GstBus *bus;
     GError *error = NULL;
-
 
     /*
      * Initialize Video pipeline

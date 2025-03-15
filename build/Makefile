@@ -68,7 +68,8 @@ SOURCES       = ../src/main.cpp \
 		moc_aaservice.cpp \
 		moc_plugininterface.cpp \
 		moc_androidauto.cpp \
-		moc_headunit.cpp
+		moc_headunit.cpp \
+		moc_aasettings.cpp
 OBJECTS       = main.o \
 		aaservice.o \
 		androidauto.o \
@@ -86,7 +87,8 @@ OBJECTS       = main.o \
 		moc_aaservice.o \
 		moc_plugininterface.o \
 		moc_androidauto.o \
-		moc_headunit.o
+		moc_headunit.o \
+		moc_aasettings.o
 DIST          = /usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/spec_pre.prf \
 		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/common/unix.conf \
 		/usr/lib/x86_64-linux-gnu/qt5/mkspecs/common/linux.conf \
@@ -201,7 +203,8 @@ DIST          = /usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/spec_pre.prf \
 		../modules/android-auto/headunit/hu/hu_uti.h \
 		../modules/android-auto/headunit/common/glib_utils.h \
 		../modules/android-auto/qgstvideobuffer.h \
-		../modules/android-auto/headunit/hu/generated.x64/hu.pb.h ../src/main.cpp \
+		../modules/android-auto/headunit/hu/generated.x64/hu.pb.h \
+		../src/aasettings.h ../src/main.cpp \
 		../src/aaservice.cpp \
 		../modules/android-auto/androidauto.cpp \
 		../modules/android-auto/headunit.cpp \
@@ -448,7 +451,7 @@ distdir: FORCE
 	$(COPY_FILE) --parents $(DIST) $(DISTDIR)/
 	$(COPY_FILE) --parents ../src/qml/qml.qrc $(DISTDIR)/
 	$(COPY_FILE) --parents /usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/data/dummy.cpp $(DISTDIR)/
-	$(COPY_FILE) --parents ../src/aaservice.h ../includes/plugininterface.h ../includes/mediainterface.h ../modules/android-auto/androidauto.h ../modules/android-auto/headunit.h ../modules/android-auto/headunit/hu/hu_aad.h ../modules/android-auto/headunit/hu/hu_aap.h ../modules/android-auto/headunit/hu/hu_ssl.h ../modules/android-auto/headunit/hu/hu_tcp.h ../modules/android-auto/headunit/hu/hu_usb.h ../modules/android-auto/headunit/hu/hu_uti.h ../modules/android-auto/headunit/common/glib_utils.h ../modules/android-auto/qgstvideobuffer.h ../modules/android-auto/headunit/hu/generated.x64/hu.pb.h $(DISTDIR)/
+	$(COPY_FILE) --parents ../src/aaservice.h ../includes/plugininterface.h ../includes/mediainterface.h ../modules/android-auto/androidauto.h ../modules/android-auto/headunit.h ../modules/android-auto/headunit/hu/hu_aad.h ../modules/android-auto/headunit/hu/hu_aap.h ../modules/android-auto/headunit/hu/hu_ssl.h ../modules/android-auto/headunit/hu/hu_tcp.h ../modules/android-auto/headunit/hu/hu_usb.h ../modules/android-auto/headunit/hu/hu_uti.h ../modules/android-auto/headunit/common/glib_utils.h ../modules/android-auto/qgstvideobuffer.h ../modules/android-auto/headunit/hu/generated.x64/hu.pb.h ../src/aasettings.h $(DISTDIR)/
 	$(COPY_FILE) --parents ../src/main.cpp ../src/aaservice.cpp ../modules/android-auto/androidauto.cpp ../modules/android-auto/headunit.cpp ../modules/android-auto/headunit/hu/hu_aad.cpp ../modules/android-auto/headunit/hu/hu_aap.cpp ../modules/android-auto/headunit/hu/hu_ssl.cpp ../modules/android-auto/headunit/hu/hu_tcp.cpp ../modules/android-auto/headunit/hu/hu_usb.cpp ../modules/android-auto/headunit/hu/hu_uti.cpp ../modules/android-auto/headunit/common/glib_utils.cpp ../modules/android-auto/qgstvideobuffer.cpp ../modules/android-auto/headunit/hu/generated.x64/hu.pb.cc $(DISTDIR)/
 
 
@@ -489,9 +492,9 @@ compiler_moc_predefs_clean:
 moc_predefs.h: /usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/data/dummy.cpp
 	g++ -pipe -O2 -std=gnu++11 -pthread -pthread -pthread -pthread -Wall -Wextra -dM -E -o moc_predefs.h /usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/data/dummy.cpp
 
-compiler_moc_header_make_all: moc_aaservice.cpp moc_plugininterface.cpp moc_androidauto.cpp moc_headunit.cpp
+compiler_moc_header_make_all: moc_aaservice.cpp moc_plugininterface.cpp moc_androidauto.cpp moc_headunit.cpp moc_aasettings.cpp
 compiler_moc_header_clean:
-	-$(DEL_FILE) moc_aaservice.cpp moc_plugininterface.cpp moc_androidauto.cpp moc_headunit.cpp
+	-$(DEL_FILE) moc_aaservice.cpp moc_plugininterface.cpp moc_androidauto.cpp moc_headunit.cpp moc_aasettings.cpp
 moc_aaservice.cpp: ../src/aaservice.h \
 		moc_predefs.h \
 		/usr/lib/qt5/bin/moc
@@ -527,6 +530,11 @@ moc_headunit.cpp: ../modules/android-auto/headunit.h \
 		/usr/lib/qt5/bin/moc
 	/usr/lib/qt5/bin/moc $(DEFINES) --include /home/pduce/mx5-dash/build/moc_predefs.h -I/usr/lib/x86_64-linux-gnu/qt5/mkspecs/linux-g++ -I/home/pduce/mx5-dash -I/home/pduce/mx5-dash/modules/android-auto -I/home/pduce/mx5-dash/modules/android-auto/headunit/hu -I/home/pduce/mx5-dash/modules/android-auto/headunit/hu/generated.x64 -I/home/pduce/mx5-dash/modules/android-auto/headunit/common -I/home/pduce/mx5-dash/includes -I/usr/include/gstreamer-1.0 -I/usr/include/x86_64-linux-gnu -I/usr/include/glib-2.0 -I/usr/lib/x86_64-linux-gnu/glib-2.0/include -I/usr/include/orc-0.4 -I/usr/local/include -I/usr/include/libusb-1.0 -I/usr/include/x86_64-linux-gnu/qt5 -I/usr/include/x86_64-linux-gnu/qt5/QtQuick -I/usr/include/x86_64-linux-gnu/qt5/QtMultimedia -I/usr/include/x86_64-linux-gnu/qt5/QtGui -I/usr/include/x86_64-linux-gnu/qt5/QtQmlModels -I/usr/include/x86_64-linux-gnu/qt5/QtQml -I/usr/include/x86_64-linux-gnu/qt5/QtNetwork -I/usr/include/x86_64-linux-gnu/qt5/QtBluetooth -I/usr/include/x86_64-linux-gnu/qt5/QtCore -I. -I/usr/include/c++/11 -I/usr/include/x86_64-linux-gnu/c++/11 -I/usr/include/c++/11/backward -I/usr/lib/gcc/x86_64-linux-gnu/11/include -I/usr/local/include -I/usr/include/x86_64-linux-gnu -I/usr/include ../modules/android-auto/headunit.h -o moc_headunit.cpp
 
+moc_aasettings.cpp: ../src/aasettings.h \
+		moc_predefs.h \
+		/usr/lib/qt5/bin/moc
+	/usr/lib/qt5/bin/moc $(DEFINES) --include /home/pduce/mx5-dash/build/moc_predefs.h -I/usr/lib/x86_64-linux-gnu/qt5/mkspecs/linux-g++ -I/home/pduce/mx5-dash -I/home/pduce/mx5-dash/modules/android-auto -I/home/pduce/mx5-dash/modules/android-auto/headunit/hu -I/home/pduce/mx5-dash/modules/android-auto/headunit/hu/generated.x64 -I/home/pduce/mx5-dash/modules/android-auto/headunit/common -I/home/pduce/mx5-dash/includes -I/usr/include/gstreamer-1.0 -I/usr/include/x86_64-linux-gnu -I/usr/include/glib-2.0 -I/usr/lib/x86_64-linux-gnu/glib-2.0/include -I/usr/include/orc-0.4 -I/usr/local/include -I/usr/include/libusb-1.0 -I/usr/include/x86_64-linux-gnu/qt5 -I/usr/include/x86_64-linux-gnu/qt5/QtQuick -I/usr/include/x86_64-linux-gnu/qt5/QtMultimedia -I/usr/include/x86_64-linux-gnu/qt5/QtGui -I/usr/include/x86_64-linux-gnu/qt5/QtQmlModels -I/usr/include/x86_64-linux-gnu/qt5/QtQml -I/usr/include/x86_64-linux-gnu/qt5/QtNetwork -I/usr/include/x86_64-linux-gnu/qt5/QtBluetooth -I/usr/include/x86_64-linux-gnu/qt5/QtCore -I. -I/usr/include/c++/11 -I/usr/include/x86_64-linux-gnu/c++/11 -I/usr/include/c++/11/backward -I/usr/lib/gcc/x86_64-linux-gnu/11/include -I/usr/local/include -I/usr/include/x86_64-linux-gnu -I/usr/include ../src/aasettings.h -o moc_aasettings.cpp
+
 compiler_moc_objc_header_make_all:
 compiler_moc_objc_header_clean:
 compiler_moc_source_make_all:
@@ -541,7 +549,8 @@ compiler_clean: compiler_rcc_clean compiler_moc_predefs_clean compiler_moc_heade
 
 ####### Compile
 
-main.o: ../src/main.cpp ../src/aaservice.h
+main.o: ../src/main.cpp ../src/aaservice.h \
+		../src/aasettings.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o main.o ../src/main.cpp
 
 aaservice.o: ../src/aaservice.cpp ../src/aaservice.h \
@@ -551,7 +560,8 @@ aaservice.o: ../src/aaservice.cpp ../src/aaservice.h \
 		../modules/android-auto/headunit/hu/hu_aap.h \
 		../modules/android-auto/headunit/hu/generated.x64/hu.pb.h \
 		../modules/android-auto/headunit/hu/hu_ssl.h \
-		../modules/android-auto/headunit/hu/hu_uti.h
+		../modules/android-auto/headunit/hu/hu_uti.h \
+		../src/aasettings.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o aaservice.o ../src/aaservice.cpp
 
 androidauto.o: ../modules/android-auto/androidauto.cpp ../modules/android-auto/androidauto.h \
@@ -572,7 +582,8 @@ headunit.o: ../modules/android-auto/headunit.cpp ../modules/android-auto/headuni
 		../modules/android-auto/headunit/hu/hu_aap.h \
 		../modules/android-auto/headunit/hu/generated.x64/hu.pb.h \
 		../modules/android-auto/headunit/hu/hu_ssl.h \
-		../modules/android-auto/headunit/hu/hu_uti.h
+		../modules/android-auto/headunit/hu/hu_uti.h \
+		../src/aasettings.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o headunit.o ../modules/android-auto/headunit.cpp
 
 hu_aad.o: ../modules/android-auto/headunit/hu/hu_aad.cpp ../modules/android-auto/headunit/hu/hu_uti.h \
@@ -637,6 +648,9 @@ moc_androidauto.o: moc_androidauto.cpp
 
 moc_headunit.o: moc_headunit.cpp 
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o moc_headunit.o moc_headunit.cpp
+
+moc_aasettings.o: moc_aasettings.cpp 
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o moc_aasettings.o moc_aasettings.cpp
 
 ####### Install
 

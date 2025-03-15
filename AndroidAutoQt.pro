@@ -38,7 +38,8 @@ HEADERS += \
     modules/android-auto/headunit/hu/hu_uti.h \
     modules/android-auto/headunit/common/glib_utils.h \
     modules/android-auto/qgstvideobuffer.h \
-    modules/android-auto/headunit/hu/generated.x64/hu.pb.h
+    modules/android-auto/headunit/hu/generated.x64/hu.pb.h \
+    src/aasettings.h
 
 # Proto files will be added after compilation
 
