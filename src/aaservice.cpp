@@ -68,6 +68,9 @@ int AAService::videoHeight() const
 
 bool AAService::mouseDown(QPoint point)
 {
+    qDebug() << "AAService::mouseDown - Raw point:" << point 
+             << "Output size:" << m_outputWidth << "x" << m_outputHeight
+             << "Video size:" << m_headunit->videoWidth() << "x" << m_headunit->videoHeight();
     return m_headunit->mouseDown(point);
 }
 
@@ -134,7 +137,8 @@ void AAService::applyCustomSettings()
     int resolutionSetting = AASettings::instance()->getSetting("resolution", "2").toInt();
     qDebug() << "Setting Android Auto resolution to:" << resolutionSetting;
     
-    // Other settings will be applied by the headunit when it initializes
+    // Debug the actual video dimensions
+    qDebug() << "Current video dimensions:" << m_headunit->videoWidth() << "x" << m_headunit->videoHeight();
 }
 
 void AAService::start()

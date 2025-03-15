@@ -24,23 +24,17 @@ Item {
             anchors.fill: parent
             
             onPressed: {
-                // Map from MouseArea coordinates to Android Auto coordinates
-                var mappedPoint = mapTouchCoordinates(mouse.x, mouse.y);
-                aaService.mouseDown(mappedPoint);
+                // Just pass raw coordinates
+                aaService.mouseDown(Qt.point(mouse.x, mouse.y));
             }
-            
+
             onPositionChanged: {
-                // Map from MouseArea coordinates to Android Auto coordinates
-                var mappedPoint = mapTouchCoordinates(mouse.x, mouse.y);
-                aaService.mouseMove(mappedPoint);
+                aaService.mouseMove(Qt.point(mouse.x, mouse.y));
             }
-            
+
             onReleased: {
-                // Map from MouseArea coordinates to Android Auto coordinates
-                var mappedPoint = mapTouchCoordinates(mouse.x, mouse.y);
-                aaService.mouseUp(mappedPoint);
+                aaService.mouseUp(Qt.point(mouse.x, mouse.y));
             }
-            
             // Function to map touch coordinates correctly
             function mapTouchCoordinates(x, y) {
                 // Scale from display size to Android Auto native size

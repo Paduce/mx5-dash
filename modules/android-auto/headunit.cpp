@@ -388,26 +388,21 @@ bool Headunit::mouseDown(QPoint point){
 }
 bool Headunit::mouseMove(QPoint point){
     if (lastAction == HU::TouchInfo::TOUCH_ACTION_PRESS) {
-        if (point.x() > m_outputWidth) {
-            QPoint falsepoint = QPoint(m_outputWidth, point.y());
-            return mouseUp(falsepoint);
-        }
-        if (point.y() > m_outputHeight) {
-            QPoint falsepoint = QPoint(point.x(), m_outputHeight);
-            mouseUp(falsepoint);
-        }
-        if (point.x() < 1) {
-            QPoint falsepoint = QPoint(1, point.y());
-            return mouseUp(falsepoint);
-        }
-        if (point.y() < 1) {
-            QPoint falsepoint = QPoint(point.x(), 1);
-            return mouseUp(falsepoint);
-        }
-        touchEvent(HU::TouchInfo::TOUCH_ACTION_DRAG, &point);
+        // Ensure point is within valid range
+        int x = point.x();
+        int y = point.y();
+        
+        if (x > m_outputWidth) x = m_outputWidth;
+        if (y > m_outputHeight) y = m_outputHeight;
+        if (x < 1) x = 1;
+        if (y < 1) y = 1;
+        
+        QPoint boundedPoint(x, y);
+        touchEvent(HU::TouchInfo::TOUCH_ACTION_DRAG, &boundedPoint);
     }
     return true;
 }
+
 bool Headunit::mouseUp(QPoint point){
     if (lastAction == HU::TouchInfo::TOUCH_ACTION_PRESS) {
         lastAction = HU::TouchInfo::TOUCH_ACTION_RELEASE;
