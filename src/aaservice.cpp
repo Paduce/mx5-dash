@@ -13,7 +13,7 @@ AAService::AAService(QObject *parent) : QObject(parent)
     // Create a timer to periodically check for devices
     m_deviceCheckTimer = new QTimer(this);
     connect(m_deviceCheckTimer, &QTimer::timeout, this, &AAService::checkForDevice);
-    m_deviceCheckTimer->start(2000); // Check every 2 seconds
+    m_deviceCheckTimer->start(1000); // Check every 2 seconds
 }
 
 void AAService::checkForDevice()
