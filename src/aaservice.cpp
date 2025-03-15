@@ -127,8 +127,7 @@ void AAService::init()
     m_headunit->init();
 }
 
-void AAService::applyCustomSettings() 
-{
+void AAService::applyCustomSettings() {
     // Apply DPI setting from config
     int dpi = AASettings::instance()->getSetting("dpi", "240").toInt();
     qDebug() << "Setting Android Auto DPI to:" << dpi;
@@ -137,10 +136,22 @@ void AAService::applyCustomSettings()
     int resolutionSetting = AASettings::instance()->getSetting("resolution", "2").toInt();
     qDebug() << "Setting Android Auto resolution to:" << resolutionSetting;
     
+    // Apply input mode settings
+    QString inputModeStr = AASettings::instance()->getSetting("inputmode", "touch").toLower();
+    qDebug() << "Setting Android Auto input mode to:" << inputModeStr;
+    
+    if (inputModeStr == "rotary") {
+        setInputMode(INPUT_MODE_ROTARY);
+    } else if (inputModeStr == "hybrid") {
+        setInputMode(INPUT_MODE_HYBRID);
+    } else {
+        // Default to touch mode
+        setInputMode(INPUT_MODE_TOUCH);
+    }
+    
     // Debug the actual video dimensions
     qDebug() << "Current video dimensions:" << m_headunit->videoWidth() << "x" << m_headunit->videoHeight();
 }
-
 void AAService::start()
 {
     if (m_headunit->status() == Headunit::RUNNING) {
@@ -164,4 +175,59 @@ void AAService::start()
 void AAService::stop()
 {
     m_headunit->stopPipelines();
+}
+
+
+int AAService::inputMode() const {
+    // Map from Headunit's internal enum to our public enum
+    int headunitMode = m_headunit->getInputMode();
+    return headunitMode; // Simply return the int value
+}
+
+void AAService::setInputMode(int mode) {
+    // Pass the int mode directly to Headunit
+    if (m_headunit->getInputMode() != mode) {
+        m_headunit->setInputMode(mode);
+        emit inputModeChanged();
+    }
+}
+
+bool AAService::rotateClockwise() {
+    return m_headunit->rotateClockwise();
+}
+
+bool AAService::rotateCounterClockwise() {
+    return m_headunit->rotateCounterClockwise();
+}
+
+bool AAService::rotateFlickClockwise() {
+    return m_headunit->rotateFlickClockwise();
+}
+
+bool AAService::rotateFlickCounterClockwise() {
+    return m_headunit->rotateFlickCounterClockwise();
+}
+
+bool AAService::dpadClick() {
+    return m_headunit->dpadClick();
+}
+
+bool AAService::dpadBack() {
+    return m_headunit->dpadBack();
+}
+
+bool AAService::dpadUp() {
+    return m_headunit->dpadUp();
+}
+
+bool AAService::dpadDown() {
+    return m_headunit->dpadDown();
+}
+
+bool AAService::dpadLeft() {
+    return m_headunit->dpadLeft();
+}
+
+bool AAService::dpadRight() {
+    return m_headunit->dpadRight();
 }

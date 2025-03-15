@@ -108,6 +108,29 @@ public:
     uint8_t m_voicePipelineVolume = 100;
 
     AndroidAuto::IHUAnyThreadInterface *g_hu = nullptr;
+
+    enum InputMode {
+        INPUT_MODE_TOUCH = 0,
+        INPUT_MODE_ROTARY = 1,
+        INPUT_MODE_HYBRID = 2
+    };
+
+    // Rotary controller actions
+    bool rotateClockwise();
+    bool rotateCounterClockwise();
+    bool rotateFlickClockwise(); 
+    bool rotateFlickCounterClockwise();
+    bool dpadClick();
+    bool dpadBack();
+    bool dpadUp();
+    bool dpadDown();
+    bool dpadLeft();
+    bool dpadRight();
+
+    // Input mode handling
+    int getInputMode() const;  // Return as int to avoid dependencies
+    void setInputMode(int mode);  // Accept as int to avoid dependencies
+
 signals:
     void outputResized();
     void videoResized();
@@ -148,5 +171,10 @@ private:
     QAbstractVideoSurface *m_surface = nullptr;
     QVideoSurfaceFormat m_format;
     bool m_videoStarted = false;
+
+    int m_inputMode = INPUT_MODE_TOUCH;
+    void sendInputEvent(HU::TouchInfo::TOUCH_ACTION action, QPoint *point);
+    void sendButtonEvent(int scanCode, bool isPressed, bool longPress = false);
+    void sendRelativeInputEvent(int scanCode, int delta);
 };
 #endif  // HEADUNITPLAYER_H

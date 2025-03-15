@@ -415,11 +415,9 @@ bool Headunit::keyEvent(QString /*key*/){
     return true;
 }
 
+// Update the touchEvent method to be more generic for different input modes
 void Headunit::touchEvent(HU::TouchInfo::TOUCH_ACTION action, QPoint *point) {
-    // If point coordinates are already in video coordinate space (from QML mapping),
-    // they might be larger than m_outputWidth/m_outputHeight
-    // So we need to check if scaling is actually needed
-    
+    // Implementation directly here instead of calling touchEvent
     unsigned int x, y;
     
     // If the point is already in the video coordinate space
@@ -443,7 +441,7 @@ void Headunit::touchEvent(HU::TouchInfo::TOUCH_ACTION action, QPoint *point) {
     if(huStarted){
         g_hu->queueCommand([action, x, y](AndroidAuto::IHUConnectionThreadInterface & s) {
             HU::InputEvent inputEvent;
-            inputEvent.set_timestamp(Headunit::get_cur_timestamp());
+            inputEvent.set_timestamp(get_cur_timestamp());
             HU::TouchInfo* touchEvent = inputEvent.mutable_touch();
             touchEvent->set_action(action);
             HU::TouchInfo::Location* touchLocation = touchEvent->add_location();
@@ -452,14 +450,14 @@ void Headunit::touchEvent(HU::TouchInfo::TOUCH_ACTION action, QPoint *point) {
             touchLocation->set_pointer_id(0);
 
             /* Send touch event */
-
             int ret = s.sendEncodedMessage(0, AndroidAuto::TouchChannel, AndroidAuto::HU_INPUT_CHANNEL_MESSAGE::InputEvent, inputEvent);
             if (ret < 0) {
-                qDebug("aa_touch_event(): hu_aap_enc_send() failed with (%d)", ret);
+                qDebug("aa_touch_event(): send failed with (%d)", ret);
             }
         });
     }
 }
+
 
 void Headunit::setVideoWidth(const int a){
     m_videoWidth = a;
@@ -741,3 +739,139 @@ void DesktopEventCallbacks::HandleNaviTurnDistance(AndroidAuto::IHUConnectionThr
                                                    const HU::NAVDistanceMessage& request){
 
 }
+
+// Add these method implementations to headunit.cpp
+
+
+int Headunit::getInputMode() const {
+    return m_inputMode;
+}
+
+void Headunit::setInputMode(int mode) {
+    m_inputMode = mode;
+    logd("Input mode set to: %d", mode);
+}
+
+bool Headunit::rotateClockwise() {
+    // Use the status() method instead of iaap_state
+    if (status() != AndroidAuto::hu_STATE_STARTED) {
+        return false;
+    }
+    sendRelativeInputEvent(AndroidAuto::HUIB_SCROLLWHEEL, 1);
+    return true;
+}
+
+bool Headunit::rotateCounterClockwise() {
+    if (status() != AndroidAuto::hu_STATE_STARTED) {
+        return false;
+    }
+    sendRelativeInputEvent(AndroidAuto::HUIB_SCROLLWHEEL, -1);
+    return true;
+}
+
+bool Headunit::rotateFlickClockwise() {
+    if (status() != AndroidAuto::hu_STATE_STARTED) {
+        return false;
+    }
+    sendRelativeInputEvent(AndroidAuto::HUIB_SCROLLWHEEL, 5);
+    return true;
+}
+
+bool Headunit::rotateFlickCounterClockwise() {
+    if (status() != AndroidAuto::hu_STATE_STARTED) {
+        return false;
+    }
+    sendRelativeInputEvent(AndroidAuto::HUIB_SCROLLWHEEL, -5);
+    return true;
+}
+
+bool Headunit::dpadClick() {
+    if (status() != AndroidAuto::hu_STATE_STARTED) {
+        return false;
+    }
+    sendButtonEvent(AndroidAuto::HUIB_ENTER, true);
+    sendButtonEvent(AndroidAuto::HUIB_ENTER, false);
+    return true;
+}
+
+bool Headunit::dpadBack() {
+    if (status() != AndroidAuto::hu_STATE_STARTED) {
+        return false;
+    }
+    sendButtonEvent(AndroidAuto::HUIB_BACK, true);
+    sendButtonEvent(AndroidAuto::HUIB_BACK, false);
+    return true;
+}
+
+bool Headunit::dpadUp() {
+    if (status() != AndroidAuto::hu_STATE_STARTED) {
+        return false;
+    }
+    sendButtonEvent(AndroidAuto::HUIB_UP, true);
+    sendButtonEvent(AndroidAuto::HUIB_UP, false);
+    return true;
+}
+
+bool Headunit::dpadDown() {
+    if (status() != AndroidAuto::hu_STATE_STARTED) {
+        return false;
+    }
+    sendButtonEvent(AndroidAuto::HUIB_DOWN, true);
+    sendButtonEvent(AndroidAuto::HUIB_DOWN, false);
+    return true;
+}
+
+bool Headunit::dpadLeft() {
+    if (status() != AndroidAuto::hu_STATE_STARTED) {
+        return false;
+    }
+    sendButtonEvent(AndroidAuto::HUIB_LEFT, true);
+    sendButtonEvent(AndroidAuto::HUIB_LEFT, false);
+    return true;
+}
+
+bool Headunit::dpadRight() {
+    if (status() != AndroidAuto::hu_STATE_STARTED) {
+        return false;
+    }
+    sendButtonEvent(AndroidAuto::HUIB_RIGHT, true);
+    sendButtonEvent(AndroidAuto::HUIB_RIGHT, false);
+    return true;
+}
+
+void Headunit::sendButtonEvent(int scanCode, bool isPressed, bool longPress) {
+    if (huStarted) {
+        g_hu->queueCommand([scanCode, isPressed, longPress](AndroidAuto::IHUConnectionThreadInterface & s) {
+            HU::InputEvent inputEvent;
+            inputEvent.set_timestamp(get_cur_timestamp());
+            HU::ButtonInfo* buttonInfo = inputEvent.mutable_button()->add_button();
+            buttonInfo->set_is_pressed(isPressed);
+            buttonInfo->set_meta(0);
+            buttonInfo->set_long_press(longPress);
+            buttonInfo->set_scan_code(scanCode);
+
+            int ret = s.sendEncodedMessage(0, AndroidAuto::TouchChannel, AndroidAuto::HU_INPUT_CHANNEL_MESSAGE::InputEvent, inputEvent);
+            if (ret < 0) {
+                qDebug("sendButtonEvent(): send failed with (%d)", ret);
+            }
+        });
+    }
+}
+
+void Headunit::sendRelativeInputEvent(int scanCode, int delta) {
+    if (huStarted) {
+        g_hu->queueCommand([scanCode, delta](AndroidAuto::IHUConnectionThreadInterface & s) {
+            HU::InputEvent inputEvent;
+            inputEvent.set_timestamp(get_cur_timestamp());
+            HU::RelativeInputEvent* relEvent = inputEvent.mutable_rel_event()->mutable_event();
+            relEvent->set_delta(delta);
+            relEvent->set_scan_code(scanCode);
+
+            int ret = s.sendEncodedMessage(0, AndroidAuto::TouchChannel, AndroidAuto::HU_INPUT_CHANNEL_MESSAGE::InputEvent, inputEvent);
+            if (ret < 0) {
+                qDebug("sendRelativeInputEvent(): send failed with (%d)", ret);
+            }
+        });
+    }
+}
+

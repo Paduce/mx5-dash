@@ -3,6 +3,7 @@
 #include <QQmlContext>
 #include <gst/gst.h>
 
+// Make sure the aaservice.h include is present
 #include "aaservice.h"
 #include "aasettings.h"
 
